@@ -1,9 +1,13 @@
-name: "my-website"
+name: "503-A5-yz678"
+output_dir: "docs"
 navbar:
-  title: "My Website"
+  title: "ANLY503-A5"
   left:
-    - text: "Plotly"
+    - text: "Home"
       href: index.html
-    - text: "About"
-      href: about.html
-  output_dir: "docs"
+    - text: "Plotly"
+      href: plotly.html
+output:
+  html_document:
+    theme: cosmo
+    highlight: textmate
