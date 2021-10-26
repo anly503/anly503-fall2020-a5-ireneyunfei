@@ -1,0 +1,166 @@
+---
+title: "A5"
+author: "yunfeiz"
+date: "10/22/2021"
+output: html_document
+---
+
+## data munging
+```{r}
+library(data.table)  
+library(readr)
+library(dplyr)
+```
+```{r}
+hours = c()
+mins = c()
+for(i in 0:23){
+  for(j in 1:6){
+    hours<-c(hours,i)
+    j = j+1
+    }
+  i = i+1
+}
+for(j in 0:5){
+  
+  mins<-c(mins,j*10)
+  j = j+1
+}
+```
+
+```{r}
+library(data.table)  
+library(readr)
+```
+
+
+```{r}
+hours = c()
+mins = c()
+for(i in 0:23){
+  for(j in 1:6){
+    hours<-c(hours,i)
+    j = j+1
+    }
+  i = i+1
+}
+for(j in 0:5){
+  
+  mins<-c(mins,j*10)
+  j = j+1
+}
+```
+
+
+```{r,warning=FALSE}
+files <- list.files(path = "./eco/05/",pattern = ".csv")
+setwd('./eco/05/')
+
+
+n <- 60*10
+##filePaths <- list.files(data_dir, "\\.csv$", full.names = TRUE)
+result_05 <- do.call(rbind, lapply(files, function(path) {
+  if (read_lines(path) !=""){
+    df1 <-fread(path, header = FALSE)
+    if(nrow(df1)==144*n){
+      df <-aggregate(df1, list(rep(1:(nrow(df1) %/% n + 1), each = n, len = nrow(df1))), mean)[-1]
+      df[["source"]] <- rep(path, nrow(df))
+      df[["hour"]]<-hours
+      df[["min"]]<-rep(mins,24)
+      df
+    }
+  }
+}))
+```
+```{r}
+write.csv(result_05,'05_sm1.csv',row.names = FALSE)
+```
+
+```{r}
+df = result_05
+
+
+```
+
+
+
+
+```{r}
+library(stringr)
+df$source = df$source %>% str_remove('.csv')
+
+df$source = as.Date(df$source)
+```
+
+
+```{r}
+names = c("powerallphases","powerl1", "powerl2","powerl3","currentneutral", "currentl1","currentl2","currentl3","voltagel1","voltagel2","voltagel3","phaseanglevoltagel2l1","phaseanglevoltagel3l1","phaseanglecurrentvoltagel1","phaseanglecurrentvoltagel2","phaseanglecurrentvoltagel3","date","hour","min")
+colnames(df)<-names
+```
+```{r}
+write.csv(df,'05_sm2.csv',row.names = FALSE)
+#df = read.csv('05_sm2.csv')
+```
+
+
+```{r}
+library(plotly)
+```
+
+```{r}
+df$time = paste(df$hour,":",df$min)
+```
+
+
+```{r}
+df$datetime = with(df, as.POSIXct(paste(date, time), format="%Y-%m-%d %H : %M"))
+```
+
+
+```{r}
+df$month = month(df$date)
+df$day = mday(df$date)
+df$year = year(df$date)
+```
+
+
+
+```{r}
+library(plotly)
+
+
+fig <- plot_ly(df, type = 'scatter', mode = 'lines',color = "#6987C9")%>%
+  add_trace(x = ~datetime, y = ~powerallphases,
+            hovertemplate=paste('<b>',df$datetime,'</b><br>Total Power=%{y}')) %>%
+  layout(showlegend = F, title='Total Power Consumption - Household #5',
+         xaxis = list(rangeslider = list(visible = T),
+                      rangeselector=list(
+                        buttons=list(
+                          
+                          list(count=1, label="1d", step="day", stepmode="backward"),
+                          list(count=7, label="1wk", step="day", stepmode="backward"),
+                          list(count=1, label="1mo", step="month", stepmode="backward"),
+                          list(count=6, label="6mo", step="month", stepmode="backward"),
+
+                          list(step="all")
+                        ))))
+fig <- fig %>%
+  layout(
+         xaxis = list(zerolinecolor = 'black',
+                      zerolinewidth = 1,
+                      gridcolor = 'ffff',
+                      title = 'Time Frame'),
+         yaxis = list(zerolinecolor = 'black',
+                      zerolinewidth = 1,
+                      gridcolor = 'lightgray',
+                      title = 'Total Power',
+                      showline= T, linewidth=1, linecolor='black',
+                      dtick = 2000),
+         plot_bgcolor='#FFFFFF', margin = 0.1, width = 900)
+fig
+```
+```{r}
+htmlwidgets::saveWidget(as_widget(fig), "plotly.html")
+knitr::purl("plotly.Rmd")
+```
+
