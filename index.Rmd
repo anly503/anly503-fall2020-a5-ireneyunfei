@@ -1,0 +1,31 @@
+---
+title: "ANLY503-A5"
+---
+
+
+
+### 1. Data Science Questions
+
+* What is the overall power consumption in a year? Are there any interesting patterns (e.g. seasonality)?
+
+* How to understand the 3 phases? Is there a significant difference of power consumption among those 3 phases?
+
+
+### 2. Plotly design rationale
+
+The first plot is built using plotly, aiming to gain an understanding of how the overall power consumption changes over the year. I only pick up one of the 3 household as a starting point, expecting the patterns would be similar as the households are in the same country (Swiss).
+
+The main variable used in this plot is the `powerallphases`, referring to the real power of all the 3 phases. However, the data size is large given its granularity. Thus, I aggregate the data into 10-mins windows. 
+
+The graph design is aimed to show the time series of power consumption in different periods of time. User can adjust the slider to look at any time period they might be interested in. I provide several frames to start. For example, if we look at the whole time series, it is obvious that winter in general would see a higher volume of power consumption, as we can imagine it gets extremely cold in the winter in Swiss. Similarly, if we look at just one day, and look for the pattern within a day, it is also clear that nights see more energy consumption – again this might be due to the low temperature, plus this household may have people working in the days.
+
+The “week”, “hour”, “month”, etc. buttons, as well as the slider can be considered as tooltips for users to explore different time periods. This can be a good start for audiences to explore the data and raise meaningful hypotheses to test further, for example, is there a significant difference in power consumption in Aug and Dec? If so, what appliances rendered the difference?
+
+
+### 3. Altair design rationale
+The second plot is built in Altair using python. The purpose is to look at the relationship of the 3 power phases. Intuitively, the 3 phases should be correlated. However, it is still interesting to look for some patterns of the 3 phases for audiences to better understand the relationship.
+
+I plotted two charts side by side, the left-hand side is power phase 1 against 2, and the right-hand side is power phase 1 against 3. The dots were colored by month, which would provide more insights if the relationships are not the same in different time of the year. There are interesting patterns showed in the plots. 
+
+Brushing can be helpful to compare the points in the two charts. By brushing the 3 light blue points at the bottom right of chart 1, we can see they are not so anomalous in chart 2. By looking deeper into it, I found actually phase 2 took a smaller proportion of consumption fom July to September, comparing to the other months.
+
